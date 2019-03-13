@@ -18,11 +18,12 @@ public class FileIndexer {
     private static final String INDEX_DIR = "c:/temp/lucene6index";
 
     public static void main(String[] args) throws Exception {
-        if (args.length < 2) {
+        if (args.length < 1) {
             System.out.println("Usage: fileindexer <directory>");
             System.exit(1);
         }
-        String filePath = args[1];
+        String filePath = args[0];
+        LOG.info("Index path {}",filePath);
         IndexWriter writer = IndexWriterFactory.createWriter(INDEX_DIR);
 
         writer.deleteAll();
