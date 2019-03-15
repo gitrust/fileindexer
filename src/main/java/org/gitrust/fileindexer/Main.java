@@ -1,7 +1,14 @@
 package org.gitrust.fileindexer;
 
 import org.apache.commons.cli.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.TopDocs;
+import org.gitrust.fileindexer.domain.Command;
+import org.gitrust.fileindexer.domain.CommandExecutor;
+import org.gitrust.fileindexer.domain.CommandParser;
 import org.gitrust.fileindexer.reader.FileIndexSearcher;
 import org.gitrust.fileindexer.reader.IndexSearcherFactory;
 
@@ -12,8 +19,9 @@ import java.util.Scanner;
 /**
  * Main application to query files in a given Lucene Index.
  */
-public class QueryApp {
+public class Main {
 
+    private static Logger LOG = LogManager.getLogger(Main.class);
     private final String luceneIndexPath;
     private FileIndexSearcher searcher;
 
@@ -35,17 +43,17 @@ public class QueryApp {
             System.exit(0);
         }
 
-        QueryApp app = new QueryApp(cmd.getOptionValue("i"));
+        Main app = new Main(cmd.getOptionValue("i"));
         try {
             app.setup();
         } catch (IOException e) {
             System.out.println("Could not setup lucene index: " + e.getMessage());
             System.exit(1);
         }
-        app.listenAndSearch();
+        app.listen();
     }
 
-    public QueryApp(String luceneIndexPath) {
+    public Main(String luceneIndexPath) {
         this.luceneIndexPath = luceneIndexPath;
     }
 
@@ -54,19 +62,21 @@ public class QueryApp {
         this.searcher = new FileIndexSearcher(indexSearcher);
     }
 
-    private void listenAndSearch() {
-        CommandParser cmd = new CommandParser(System.out,this.searcher);
+    private void listen() {
+        CommandExecutor commander = new Commander(this.searcher, System.out);
+        CommandParser cmdParser = new CommandParser();
         Scanner scanner = new Scanner(System.in);
         try {
             while (true) {
-                System.out.println("> Input search query: ");
+                System.out.print("> Input search query: ");
                 long then = System.currentTimeMillis();
                 String userInput = scanner.nextLine();
                 long now = System.currentTimeMillis();
-                cmd.execCmd(userInput);
+                Command cmd = cmdParser.parseCommand(userInput);
+                commander.executeCommand(cmd);
             }
-        } catch(IllegalStateException  e) {
-            System.out.println("");
+        } catch (IllegalStateException e) {
+            LOG.debug("Could not execute search");
         }
     }
 
@@ -78,21 +88,45 @@ public class QueryApp {
         return options;
     }
 
-    class CommandParser {
-        private final PrintStream printStream;
+    private class Commander implements CommandExecutor {
+        // TODO move command implementation to appropriate package
         private final FileIndexSearcher searcher;
+        private final PrintStream output;
 
-        CommandParser(PrintStream printStream, FileIndexSearcher searcher) {
-
-            this.printStream = printStream;
+        Commander(FileIndexSearcher searcher, PrintStream output) {
             this.searcher = searcher;
+            this.output = output;
         }
 
-        public void execCmd(String command) {
-            this.printStream.println("Command: "+command);
-            if ("exit".equals(command)) {
+        @Override
+        public void executeCommand(Command cmd) {
+            if ("exit".equals(cmd.getCommand())) {
                 System.exit(0);
+            } else if ("q".equals(cmd.getCommand())) {
+                try {
+                    TopDocs result = searcher.searchByFileName(cmd.getFirstArgument());
+                    this.printSearchResults(result);
+                } catch (org.apache.lucene.queryparser.classic.ParseException e) {
+                    printError(e);
+                } catch (IOException e) {
+                    printError(e);
+                }
             }
         }
+
+        private void printSearchResults(TopDocs result) {
+            this.output.println("SearchResult: ");
+            this.output.println("Total Hits: " + result.totalHits);
+            ScoreDoc[] docs = result.scoreDocs;
+            for (ScoreDoc doc:  docs) {
+                this.output.println(doc.toString());
+            }
+        }
+
+        private void printError(Exception e) {
+
+        }
     }
+
+
 }

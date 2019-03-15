@@ -13,17 +13,19 @@ import java.nio.file.Paths;
 
 
 public class FileIndexer {
-    static Logger LOG = LogManager.getLogger(FileIndexer.class);
+    private static Logger LOG = LogManager.getLogger(FileIndexer.class);
 
     private static final String INDEX_DIR = "c:/temp/lucene6index";
 
     public static void main(String[] args) throws Exception {
-        if (args.length < 1) {
-            System.out.println("Usage: fileindexer <directory>");
+        if (args.length < 2) {
+            System.out.println("Usage: fileindexer <indexerpath> <directory>");
             System.exit(1);
         }
-        String filePath = args[0];
-        LOG.info("Index path {}",filePath);
+        String indexerPath = args[0];
+        String filePath = args[1];
+        LOG.info("Use indexer path {}", indexerPath);
+        LOG.info("Index directory {}", filePath);
         IndexWriter writer = IndexWriterFactory.createWriter(INDEX_DIR);
 
         writer.deleteAll();
@@ -35,14 +37,14 @@ public class FileIndexer {
     }
 
     private static void writeDocument(IndexWriter writer, Path path) {
-        LOG.debug("Index path {}", path);
+        LOG.trace("Index path {}", path);
         File file = path.toFile();
         FileDocument fd = FileDocument.builder().absolutePath(file.getAbsolutePath()).fileName(file.getName()).fileSize(file.getTotalSpace()).build();
         Document doc = DocumentFactory.createDocument(fd);
         try {
             writer.addDocument(doc);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.warn("Could not index document {}",fd);
         }
     }
 }

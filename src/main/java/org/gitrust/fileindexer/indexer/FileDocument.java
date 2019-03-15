@@ -2,9 +2,11 @@ package org.gitrust.fileindexer.indexer;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 
 @Builder
 @Getter
+@ToString
 public class FileDocument {
     public static final String FIELD_SIZE ="fileSize";
     public static final String FIELD_NAME ="fileName";

@@ -11,7 +11,7 @@
     </Appenders>
 
     <Loggers>
-        <Logger name="org.gitrust" level="debug"/>
+        <Logger name="org.gitrust" level="trace"/>
 
         <Root level="info">
             <AppenderRef ref="STDOUT"/>
