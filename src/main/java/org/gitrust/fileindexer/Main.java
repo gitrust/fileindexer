@@ -3,12 +3,17 @@ package org.gitrust.fileindexer;
 import org.apache.commons.cli.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.store.Directory;
 import org.gitrust.fileindexer.domain.Command;
 import org.gitrust.fileindexer.domain.CommandExecutor;
 import org.gitrust.fileindexer.domain.CommandParser;
+import org.gitrust.fileindexer.indexer.FileDocument;
+import org.gitrust.fileindexer.reader.FileIndexReader;
 import org.gitrust.fileindexer.reader.FileIndexSearcher;
 import org.gitrust.fileindexer.reader.IndexSearcherFactory;
 
@@ -24,6 +29,8 @@ public class Main {
     private static Logger LOG = LogManager.getLogger(Main.class);
     private final String luceneIndexPath;
     private FileIndexSearcher searcher;
+    private FileIndexReader indexReader;
+
 
     public static void main(String[] argv) {
         System.out.println("Starting query app...");
@@ -60,6 +67,7 @@ public class Main {
     private void setup() throws IOException {
         IndexSearcher indexSearcher = IndexSearcherFactory.createSearcher(this.luceneIndexPath);
         this.searcher = new FileIndexSearcher(indexSearcher);
+        this.indexReader = FileIndexReader.createFromIndexSearcher(indexSearcher);
     }
 
     private void listen() {
@@ -115,16 +123,22 @@ public class Main {
         }
 
         private void printSearchResults(TopDocs result) {
-            this.output.println("SearchResult: ");
             this.output.println("Total Hits: " + result.totalHits);
             ScoreDoc[] docs = result.scoreDocs;
             for (ScoreDoc doc:  docs) {
-                this.output.println(doc.toString());
+                FileDocument fd = null;
+                try {
+                    fd = indexReader.getFileDocument(doc.doc);
+                    this.output.println(fd.getFileName());
+                } catch (IOException e) {
+                    printError(e);
+                }
+
             }
         }
 
         private void printError(Exception e) {
-
+            this.output.println(e.getMessage());
         }
     }
 

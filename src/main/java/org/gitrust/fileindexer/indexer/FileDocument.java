@@ -1,8 +1,6 @@
 package org.gitrust.fileindexer.indexer;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
 
 @Builder
 @Getter
@@ -15,4 +13,5 @@ public class FileDocument {
     private long fileSize;
     private String fileName;
     private String absolutePath;
+    private int docId;
 }
