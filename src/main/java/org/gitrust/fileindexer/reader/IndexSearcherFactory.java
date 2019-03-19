@@ -1,5 +1,7 @@
 package org.gitrust.fileindexer.reader;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.IndexSearcher;
@@ -10,9 +12,10 @@ import java.io.IOException;
 import java.nio.file.Paths;
 
 public class IndexSearcherFactory {
+    private static Logger LOG = LogManager.getLogger(IndexSearcherFactory.class);
 
-    public static IndexSearcher createSearcher(String indexPath) throws IOException
-    {
+    public static IndexSearcher createSearcher(String indexPath) throws IOException {
+        LOG.info("Create index searcher for path {}", indexPath);
         Directory dir = FSDirectory.open(Paths.get(indexPath));
         IndexReader reader = DirectoryReader.open(dir);
         IndexSearcher searcher = new IndexSearcher(reader);

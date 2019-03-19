@@ -17,12 +17,11 @@ public class FileIndexReader {
             return FileDocument.builder().build();
         }
 
-        FileDocument fileDoc = FileDocument.builder()
-                //.fileSize(doc.getField(FileDocument.FIELD_SIZE).numericValue().longValue())
+        return FileDocument.builder()
+                .fileSize(doc.getField(FileDocument.FIELD_SIZE).numericValue().longValue())
                 .absolutePath(doc.getField(FileDocument.FIELD_PATH).stringValue())
                 .docId(docId)
                 .fileName(doc.getField(FileDocument.FIELD_NAME).stringValue()).build();
-        return fileDoc;
     }
 
     public static FileIndexReader createFromIndexSearcher(IndexSearcher indexSearcher) {
