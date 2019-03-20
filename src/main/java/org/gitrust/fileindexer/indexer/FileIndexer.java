@@ -40,10 +40,18 @@ public class FileIndexer {
     }
 
     public void generateIndex() throws IOException {
-        IndexWriter writer = IndexWriterFactory.createWriter(INDEX_DIR);
+        IndexWriter indexWriter = IndexWriterFactory.createWriter(INDEX_DIR);
+        indexWriter.deleteAll();
 
-        writer.deleteAll();
+        try {
+            walkFileTree(indexWriter);
+        } finally {
+            indexWriter.commit();
+            indexWriter.close();
+        }
+    }
 
+    private void walkFileTree(IndexWriter writer) throws IOException {
         Files.walkFileTree(Paths.get(this.filesPath), new HashSet<FileVisitOption>(Arrays.asList(FileVisitOption.FOLLOW_LINKS)),
                 Integer.MAX_VALUE, new SimpleFileVisitor<Path>() {
                     @Override
@@ -63,10 +71,6 @@ public class FileIndexer {
                         return FileVisitResult.CONTINUE;
                     }
                 });
-
-
-        writer.commit();
-        writer.close();
     }
 
     private void writeDocument(IndexWriter writer, Path path) {

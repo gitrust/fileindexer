@@ -8,7 +8,6 @@ import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TopDocs;
-import org.gitrust.fileindexer.Main;
 import org.gitrust.fileindexer.indexer.FileDocument;
 
 import java.io.IOException;
