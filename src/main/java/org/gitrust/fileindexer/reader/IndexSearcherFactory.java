@@ -14,11 +14,10 @@ import java.nio.file.Paths;
 public class IndexSearcherFactory {
     private static Logger LOG = LogManager.getLogger(IndexSearcherFactory.class);
 
-    public static IndexSearcher createSearcher(String indexPath) throws IOException {
+    public static FileIndexSearcher createFileIndexSearcher(String indexPath) throws IOException {
         LOG.info("Create index searcher for path {}", indexPath);
         Directory dir = FSDirectory.open(Paths.get(indexPath));
         IndexReader reader = DirectoryReader.open(dir);
-        IndexSearcher searcher = new IndexSearcher(reader);
-        return searcher;
+        return new FileIndexSearcher(new IndexSearcher(reader));
     }
 }

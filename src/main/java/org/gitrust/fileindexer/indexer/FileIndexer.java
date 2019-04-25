@@ -7,10 +7,12 @@ import org.apache.lucene.index.IndexWriter;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Optional;
 
 
 public class FileIndexer {
@@ -76,12 +78,25 @@ public class FileIndexer {
     private void writeDocument(IndexWriter writer, Path path) {
         LOG.trace("Index path {}", path);
         File file = path.toFile();
-        FileDocument fd = FileDocument.builder().absolutePath(file.getAbsolutePath()).fileName(file.getName()).fileSize(file.length()).build();
+        FileDocument.FileDocumentBuilder builder = FileDocument.builder().absolutePath(file.getAbsolutePath()).fileName(file.getName()).fileSize(file.length());
+        Optional<String> md5Hex = md5Hex(path);
+        if (md5Hex.isPresent()) {
+            builder.md5Hex(md5Hex.get());
+        }
+        FileDocument fd = builder.build();
         Document doc = DocumentFactory.createDocument(fd);
         try {
             writer.addDocument(doc);
         } catch (IOException e) {
             LOG.warn("Could not index document {}", fd);
+        }
+    }
+
+    private Optional<String> md5Hex(Path path) {
+        try (InputStream is = Files.newInputStream(path)) {
+            return Optional.ofNullable(org.apache.commons.codec.digest.DigestUtils.md5Hex(is));
+        } catch (IOException e) {
+            return Optional.empty();
         }
     }
 }
