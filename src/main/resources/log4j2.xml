@@ -14,7 +14,7 @@
         <Logger name="org.gitrust" level="trace"/>
 
         <Root level="info">
-            <!--AppenderRef ref="STDOUT"/-->
+            <AppenderRef ref="STDOUT"/>
             <AppenderRef ref="FILE"/>
         </Root>
     </Loggers>

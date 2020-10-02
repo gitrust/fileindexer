@@ -3,16 +3,13 @@ package org.gitrust.fileindexer;
 import org.apache.commons.cli.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
-import org.apache.lucene.store.Directory;
 import org.gitrust.fileindexer.domain.Command;
 import org.gitrust.fileindexer.domain.CommandExecutor;
 import org.gitrust.fileindexer.domain.CommandParser;
 import org.gitrust.fileindexer.indexer.FileDocument;
+import org.gitrust.fileindexer.plugins.PluginRegistry;
 import org.gitrust.fileindexer.reader.FileIndexReader;
 import org.gitrust.fileindexer.reader.FileIndexSearcher;
 import org.gitrust.fileindexer.reader.IndexSearcherFactory;
@@ -65,16 +62,17 @@ public class Main {
     }
 
     private void setup() throws IOException {
-        IndexSearcher indexSearcher = IndexSearcherFactory.createSearcher(this.luceneIndexPath);
-        this.searcher = new FileIndexSearcher(indexSearcher);
-        this.indexReader = FileIndexReader.createFromIndexSearcher(indexSearcher);
+        this.searcher = IndexSearcherFactory.createFileIndexSearcher(this.luceneIndexPath);
+        this.indexReader = FileIndexReader.createFileIndexReader(this.searcher.getIndexReader());
     }
 
     private void listen() {
         CommandExecutor commander = new Commander(this.searcher, System.out);
         CommandParser cmdParser = new CommandParser();
         Scanner scanner = new Scanner(System.in);
+
         try {
+            System.out.println("Known field names: " + PluginRegistry.instance().getRegisteredFieldNames());
             while (true) {
                 System.out.print("> Input search query: ");
                 long then = System.currentTimeMillis();
@@ -112,7 +110,7 @@ public class Main {
                 System.exit(0);
             } else if ("q".equals(cmd.getCommand())) {
                 try {
-                    TopDocs result = searcher.searchByFileName(cmd.getFirstArgument());
+                    TopDocs result = searcher.searchText(cmd.getFirstArgument());
                     this.printSearchResults(result);
                 } catch (org.apache.lucene.queryparser.classic.ParseException e) {
                     printError(e);
@@ -125,11 +123,10 @@ public class Main {
         private void printSearchResults(TopDocs result) {
             this.output.println("Total Hits: " + result.totalHits);
             ScoreDoc[] docs = result.scoreDocs;
-            for (ScoreDoc doc:  docs) {
-                FileDocument fd = null;
+            for (ScoreDoc doc : docs) {
                 try {
-                    fd = indexReader.getFileDocument(doc.doc);
-                    this.output.println(fd.getFileName());
+                    FileDocument fd = indexReader.getFileDocument(doc.doc);
+                    this.output.println("docId: " + fd.getDocId() + ", file: " + fd);
                 } catch (IOException e) {
                     printError(e);
                 }
