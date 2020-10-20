@@ -10,10 +10,10 @@ import org.apache.tika.metadata.TikaCoreProperties;
 import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.sax.BodyContentHandler;
+import org.gitrust.fileindexer.plugins.CommonFields;
 import org.gitrust.fileindexer.plugins.DocumentParser;
 import org.xml.sax.SAXException;
 
-import javax.xml.soap.Text;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -35,10 +35,10 @@ public class PdfDocumentParser implements DocumentParser {
             Integer pages = Integer.valueOf(metadata.get("xmpTPg:NPages"));
 
             if (StringUtils.isNotBlank(text))
-                document.add(new TextField("pdf_text", text, Field.Store.NO));
+                document.add(new TextField(CommonFields.TEXT.getName(), text, Field.Store.NO));
 
             if (title != null)
-                document.add(new StringField("pdf_title", title, Field.Store.NO));
+                document.add(new StringField(CommonFields.TITLE.getName(), title, Field.Store.NO));
 
             if (pages != null)
                 document.add(new StoredField("pdf_pages", pages));

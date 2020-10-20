@@ -31,7 +31,7 @@ class EmailMsgDocumentParser implements DocumentParser {
         storeString("email_fromname", fromName, document);
         storeString("email_to", to, document);
         storeString("email_toname", toName, document);
-        storeString("email_subject", subject, document);
+        storeString(CommonFields.SUBJECT.getName(), subject, document);
         storeString("email_hasattachments", Boolean.toString(hasAttachments), document);
 
         if (emailDate != null)

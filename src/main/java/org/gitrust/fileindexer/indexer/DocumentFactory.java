@@ -6,6 +6,7 @@ public class DocumentFactory {
 
     /**
      * Create a lucence Document with initial file fields
+     *
      * @param fileDocument
      * @return
      */

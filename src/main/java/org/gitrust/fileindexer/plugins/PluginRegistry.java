@@ -41,7 +41,6 @@ public class PluginRegistry {
     }
 
     /**
-     *
      * @return all registered field names
      */
     public List<String> getRegisteredFieldNames() {

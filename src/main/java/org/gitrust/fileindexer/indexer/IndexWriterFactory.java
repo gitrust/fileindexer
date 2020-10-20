@@ -10,10 +10,10 @@ import java.nio.file.Paths;
 
 public class IndexWriterFactory {
 
-    public static IndexWriter createWriter(String indexDir) throws  IOException {
+    public static IndexWriter createWriter(String indexDir) throws IOException {
         FSDirectory dir = FSDirectory.open(Paths.get(indexDir));
         IndexWriterConfig config = new IndexWriterConfig(new StandardAnalyzer());
-        IndexWriter writer = new IndexWriter(dir,config);
+        IndexWriter writer = new IndexWriter(dir, config);
         return writer;
     }
 }
