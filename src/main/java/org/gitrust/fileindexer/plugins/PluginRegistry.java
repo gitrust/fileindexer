@@ -2,6 +2,7 @@ package org.gitrust.fileindexer.plugins;
 
 import org.gitrust.fileindexer.plugins.msg.OutlookMsgPlugin;
 import org.gitrust.fileindexer.plugins.pdf.PdfPlugin;
+import org.gitrust.fileindexer.plugins.plaintext.PlaintextPlugin;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,6 +19,7 @@ public class PluginRegistry {
     static {
         INSTANCE.plugins.add(new OutlookMsgPlugin());
         INSTANCE.plugins.add(new PdfPlugin());
+        INSTANCE.plugins.add(new PlaintextPlugin());
 
         for (Plugin p : INSTANCE.plugins) {
             INSTANCE.fieldNames.addAll(Arrays.asList(p.getFieldNames()));
