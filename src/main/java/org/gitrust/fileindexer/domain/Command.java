@@ -12,8 +12,7 @@ public class Command {
     private String[] arguments;
 
     public Command(String command) {
-        this.command = command;
-        this.arguments = new String[]{};
+        this(command, new String[]{});
     }
 
     public String getFirstArgument() {

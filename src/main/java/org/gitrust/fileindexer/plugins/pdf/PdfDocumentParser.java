@@ -1,8 +1,8 @@
 package org.gitrust.fileindexer.plugins.pdf;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.util.Strings;
 import org.apache.lucene.document.*;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
@@ -34,7 +34,7 @@ public class PdfDocumentParser implements DocumentParser {
             String title = metadata.get(TikaCoreProperties.TITLE);
             Integer pages = Integer.valueOf(metadata.get("xmpTPg:NPages"));
 
-            if (StringUtils.isNotBlank(text))
+            if (Strings.isNotBlank(text))
                 document.add(new TextField(CommonFields.TEXT.getName(), text, Field.Store.NO));
 
             if (title != null)

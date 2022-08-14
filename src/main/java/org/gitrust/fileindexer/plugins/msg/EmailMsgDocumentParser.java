@@ -2,7 +2,8 @@ package org.gitrust.fileindexer.plugins.msg;
 
 import com.auxilii.msgparser.Message;
 import com.auxilii.msgparser.MsgParser;
-import org.apache.commons.lang3.StringUtils;
+
+import org.apache.logging.log4j.util.Strings;
 import org.apache.lucene.document.*;
 import org.gitrust.fileindexer.plugins.CommonFields;
 import org.gitrust.fileindexer.plugins.DocumentParser;
@@ -37,13 +38,13 @@ class EmailMsgDocumentParser implements DocumentParser {
         if (emailDate != null)
             storeString("email_date", DateTools.dateToString(emailDate, DateTools.Resolution.SECOND), document);
 
-        if (StringUtils.isNotBlank(bodyText))
+        if (Strings.isNotBlank(bodyText))
             document.add(new TextField(CommonFields.TEXT.getName(), bodyText, Field.Store.NO));
 
     }
 
     private void storeString(String name, String value, Document document) {
-        if (StringUtils.isNotBlank(value))
+        if (Strings.isNotBlank(value))
             document.add(new StringField(name, value, Field.Store.YES));
     }
 }

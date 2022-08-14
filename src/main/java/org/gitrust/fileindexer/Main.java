@@ -69,9 +69,9 @@ public class Main {
     private void listen() {
         CommandExecutor commander = new Commander(this.searcher, System.out);
         CommandParser cmdParser = new CommandParser();
-        Scanner scanner = new Scanner(System.in);
+       
 
-        try {
+        try ( Scanner scanner = new Scanner(System.in)){
             System.out.println("Known field names: " + PluginRegistry.instance().getRegisteredFieldNames());
             while (true) {
                 System.out.print("> Input search query: ");
